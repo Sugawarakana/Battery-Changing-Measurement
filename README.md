@@ -9,7 +9,7 @@ Wires
 Poron capacitor array
 
 # Connection guides
-**Raspberry Pi 3 Model B**
+**Raspberry Pi 3 Model B**<br>
 Raspberry Pi-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor
 
 **Laptop + Maker Pi Pico**
