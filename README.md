@@ -1,5 +1,5 @@
 # Introduction
-This is a repository for BCL Group. Currently updating.<br>
+This is a repository for BCL. Currently updating.<br>
 
 # Devices used
 Laptop + Maker Pi Pico / Raspberry Pi 3 Model B<br>
