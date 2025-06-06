@@ -20,6 +20,19 @@ Raspberry Pi-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor<br>
 laptop-(usb-microusb)-Pico-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor<br>
 Communication via serial monitor<br>
 
+# Fixture notation
+The distance sensor is fixed inside the top layer, and the pin works on top of the bottom layer. Normally the distance between top and bottom is changeless, but in the calibration procedure, we change the tightness of screws to simulate the swell of battery, which compresses the Poron capacitor array.<br>
+(From top to bottom)<br>
+Top Layer-Solid Metal Stuff-Medium Layer-Battery-Poron Capacitor Array-Bottom Layer
+
+# Calibration Procedures
+Install the fixture as shown in the figure, keep all of the screws loose. Reset the Keyence readings to 0.  
+Remove the Poron capacitor array and get the original thickness of capacitor pad.  
+Put capacitors inside again, tighten the screws lightly with fingers, reset the Keyence readings to 0 and record the capacitance readings on computer screen.  
+Tighten the screws evenly by making sure the Keyence readings close to each other, record the distance and capacitance readings on computer screen for several groups.  
+
+
+
 # Settings
 hostname: analogK<br>
 username: analog<br>
