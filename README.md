@@ -7,6 +7,8 @@ Laptop + Maker Pi Pico / Raspberry Pi 3 Model B<br>
 1 × TCA9548A I2C Multiplexer<br>
 Wires<br>
 Poron capacitor array<br>
+Metal fixture<br>
+Keyence GT2-H12KL High-Accuracy Digital Contact Sensor<br>
 
 # Connection guides
 **Raspberry Pi 3 Model B**<br>
