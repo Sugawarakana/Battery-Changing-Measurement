@@ -1,5 +1,6 @@
 # Introduction
-This is a repository for BCL. Currently updating.<br>
+This is a repository for Battery Control Lab (BCL). Currently updating. Due to high cost of 
+<br>
 
 # Devices used
 Laptop + Maker Pi Pico / Raspberry Pi 3 Model B<br>
@@ -32,12 +33,13 @@ Put capacitors inside again, tighten the screws lightly with fingers, reset the 
 Tighten the screws evenly by making sure the Keyence readings close to each other, record the distance and capacitance readings on computer screen for several groups.  
 
 
-
 # Settings
+For Raspberry Pi:
 hostname: analogK<br>
 username: analog<br>
 access via mstsc<br>
 
 # Codes:
 Monitor.py is for Raspberry Pi<br>
+Data_log.py is for Pico Pi data logging  
 Monitor.ino is for Pico Pi<br>
