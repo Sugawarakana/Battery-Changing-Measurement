@@ -211,6 +211,6 @@ void loop() {
     // Serial.println(" pF");
     // Serial.print(capacitance1.r7, 8);
     // Serial.println(" pF");
-    delay(5000);
+    delay(500);
 }
 
