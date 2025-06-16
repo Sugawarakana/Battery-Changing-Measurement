@@ -2,7 +2,7 @@
 This is a repository for Battery Control Lab (BCL). Currently updating.  
 In the Battery Control Lab, we aim to keep tracking the status of batteries in electric vehicles when charging or discharging. The common idea is that the thickness of battery varies when power changes. However, precise distance sensors are relatively expensive, may not work well for industrial applications. Thus, we're trying to convert length to another physical quantity that can be economically measured.  
 Recall the way to calculate capacitance from the high school physical books:
-https://github.com/Sugawarakana/BCL/blob/main/Cap.png
+!https://github.com/Sugawarakana/BCL/blob/main/Cap.png
 We can use the relationship between *d* and *C*. With capacitance measurement, we can estimate current thickness of battery.
 
 # Devices used
