@@ -49,6 +49,14 @@ laptop-(usb-microusb)-Pico-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor
 
 Communication via serial monitor  
 
+# AD7746 guides
+
+(Updating)
+
+# TCA9548A guides
+
+(Updating)
+
 # Fixture notation
 
 The distance sensor is fixed inside the top layer, and the pin works on top of the bottom layer. Normally the distance between top and bottom is changeless, but in the calibration procedure, we change the tightness of screws to simulate the swell of battery, which compresses the Poron capacitor array.  
@@ -57,7 +65,7 @@ The distance sensor is fixed inside the top layer, and the pin works on top of t
 
 Top Layer-Solid Metal Stuff-Medium Layer-Battery-Poron Capacitor Array-Bottom Layer  
 
-# Calibration Procedures
+# Calibration procedures
 
 Install the fixture as shown in the figure, keep all of the screws loose. Reset the Keyence readings to 0.  
 
@@ -67,8 +75,15 @@ Put capacitors inside again, tighten the screws lightly with fingers, reset the 
 
 Tighten the screws evenly by making sure the Keyence readings close to each other, record the distance and capacitance readings on computer screen for several groups.  
 
+# Sampling delay and standard error
 
-# Settings
+(Updating)
+
+# Data Logging
+
+(Updating)
+
+# Remote settings
 
 For Raspberry Pi:  
 
@@ -78,7 +93,7 @@ username: analog
 
 access via mstsc  
 
-# Codes
+# About this folder
 
 Monitor.py is for Raspberry Pi  
 
