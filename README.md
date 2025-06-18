@@ -10,6 +10,15 @@ Recall the way to calculate capacitance from the high school physical books:
 
 We can use the relationship between *d* and *C*. With capacitance measurement, we can estimate current thickness of battery.  
 
+The ongoing work is divided into several steps:  
+
+1. Let AD7746 read a single capacitance;
+2. Let AD7746 read two capacitances alternatively through different channels;
+3. Let microprocessor connect two AD7746 chips at the same address, enabling 4-points reading;
+4. Use 4-points reading pad to calibrate the relationship between *d* and *C*;
+5. Optimize the delay and error;
+6. ..
+
 # Devices used
 
 Laptop + Maker Pi Pico / Raspberry Pi 3 Model B  
@@ -22,7 +31,7 @@ Wires
 
 Poron capacitor array  
 
-Metal fixture  
+3-Layer Metal fixture  
 
 Keyence GT2-H12KL High-Accuracy Digital Contact Sensor  
 
