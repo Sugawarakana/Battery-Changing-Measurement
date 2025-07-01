@@ -22,15 +22,18 @@ def getFileID():
 if __name__ == '__main__':
     f_lst = list(getFileID())
     # print(f_lst)
-    while True:
+    count = 0
+    while count < 45:
         line = ser.readline().decode('utf-8')[:-1]
-        # f_lst[0].write(line) # delete \n
-        # f_lst[0].flush()
-        print(line)
-        # for i in range(1, 5):
-        #     identifier = str(i - 1) + ':'
-        #     if identifier in line:
-        #         f_lst[i].write(line)
-        #         f_lst[i].flush()
+        f_lst[0].write(line) # delete \n
+        f_lst[0].flush()
+        # print(line)
+        for i in range(1, 5):
+            identifier = str(i - 1) + ':'
+            if identifier in line:
+                f_lst[i].write(line)
+                f_lst[i].flush()
         
-    # f.close()
+        count += 1
+    for i in range(1, 5):
+        f_lst[i].close()
