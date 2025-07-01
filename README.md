@@ -10,6 +10,15 @@ Recall the way to calculate capacitance from the high school physical books:
 
 We can use the relationship between *d* and *C*. With capacitance measurement, we can estimate current thickness of battery.  
 
+The ongoing work is divided into several steps:  
+
+1. Let AD7746 read a single capacitance;
+2. Let AD7746 read two capacitances alternatively through different channels;
+3. Let microprocessor connect two AD7746 chips at the same address, enabling 4-points reading;
+4. Use 4-points reading pad to calibrate the relationship between *d* and *C*;
+5. Optimize the delay and error;
+6. ..
+
 # Devices used
 
 Laptop + Maker Pi Pico / Raspberry Pi 3 Model B  
@@ -22,7 +31,7 @@ Wires
 
 Poron capacitor array  
 
-Metal fixture  
+3-Layer Metal fixture  
 
 Keyence GT2-H12KL High-Accuracy Digital Contact Sensor  
 
@@ -40,6 +49,14 @@ laptop-(usb-microusb)-Pico-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor
 
 Communication via serial monitor  
 
+# AD7746 guides
+
+(Updating)
+
+# TCA9548A guides
+
+Used to split the data and clock line (SDA & SCL). The datasheet is in the **guides** folder. Set the switch by send a 8-bit data to the designated address.
+
 # Fixture notation
 
 The distance sensor is fixed inside the top layer, and the pin works on top of the bottom layer. Normally the distance between top and bottom is changeless, but in the calibration procedure, we change the tightness of screws to simulate the swell of battery, which compresses the Poron capacitor array.  
@@ -48,7 +65,7 @@ The distance sensor is fixed inside the top layer, and the pin works on top of t
 
 Top Layer-Solid Metal Stuff-Medium Layer-Battery-Poron Capacitor Array-Bottom Layer  
 
-# Calibration Procedures
+# Calibration procedures
 
 Install the fixture as shown in the figure, keep all of the screws loose. Reset the Keyence readings to 0.  
 
@@ -58,8 +75,15 @@ Put capacitors inside again, tighten the screws lightly with fingers, reset the 
 
 Tighten the screws evenly by making sure the Keyence readings close to each other, record the distance and capacitance readings on computer screen for several groups.  
 
+# Sampling delay and standard error
 
-# Settings
+(Updating)
+
+# Data Logging
+
+(Updating)
+
+# Remote settings
 
 For Raspberry Pi:  
 
@@ -69,7 +93,7 @@ username: analog
 
 access via mstsc  
 
-# Codes
+# About this folder
 
 Monitor.py is for Raspberry Pi  
 
