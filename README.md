@@ -6,7 +6,7 @@ In the Battery Control Lab, we aim to keep tracking the status of batteries in e
 
 Recall the way to calculate capacitance from the high school physical books:  
 
-![Capacitance](./Cap.png)  
+![Capacitance](./images/Cap.png)  
 
 We can use the relationship between *d* and *C*. With capacitance measurement, we can estimate current thickness of battery.  
 
