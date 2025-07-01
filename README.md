@@ -55,7 +55,7 @@ Communication via serial monitor
 
 # TCA9548A guides
 
-(Updating)
+Used to split the data and clock line (SDA & SCL). The datasheet is in the **guides** folder. Set the switch by send a 8-bit data to the designated address.
 
 # Fixture notation
 
