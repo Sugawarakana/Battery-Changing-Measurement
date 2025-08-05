@@ -1,0 +1,225 @@
+Capacitance0: 13.67696
+Capacitance1: 13.14833
+Capacitance2: 13.82304
+Capacitance3: 13.77381
+ 
+Capacitance0: 13.67983
+Capacitance1: 13.15184
+Capacitance2: 13.82824
+Capacitance3: 13.77425
+ 
+Capacitance0: 13.67999
+Capacitance1: 13.15162
+Capacitance2: 13.82839
+Capacitance3: 13.77426
+ 
+Capacitance0: 13.67821
+Capacitance1: 13.15293
+Capacitance2: 13.82921
+Capacitance3: 13.77472
+ 
+Capacitance0: 13.67876
+Capacitance1: 13.15167
+Capacitance2: 13.82773
+Capacitance3: 13.77478
+ 
+Capacitance0: 13.67817
+Capacitance1: 13.15162
+Capacitance2: 13.82968
+Capacitance3: 13.77502
+ 
+Capacitance0: 13.67818
+Capacitance1: 13.15341
+Capacitance2: 13.82937
+Capacitance3: 13.77528
+ 
+Capacitance0: 13.68006
+Capacitance1: 13.15356
+Capacitance2: 13.82848
+Capacitance3: 13.77604
+ 
+Capacitance0: 13.67922
+Capacitance1: 13.15174
+Capacitance2: 13.82922
+Capacitance3: 13.77594
+ 
+Capacitance0: 13.90852
+Capacitance1: 13.31526
+Capacitance2: 14.05126
+Capacitance3: 13.95431
+ 
+Capacitance0: 13.93643
+Capacitance1: 13.34338
+Capacitance2: 14.08217
+Capacitance3: 13.98696
+ 
+Capacitance0: 13.93598
+Capacitance1: 13.34522
+Capacitance2: 14.08329
+Capacitance3: 13.98473
+ 
+Capacitance0: 13.93620
+Capacitance1: 13.34562
+Capacitance2: 14.08385
+Capacitance3: 13.98590
+ 
+Capacitance0: 13.93636
+Capacitance1: 13.34420
+Capacitance2: 14.08475
+Capacitance3: 13.98699
+ 
+Capacitance0: 13.93635
+Capacitance1: 13.34442
+Capacitance2: 14.08568
+Capacitance3: 13.98720
+ 
+Capacitance0: 13.93815
+Capacitance1: 13.34478
+Capacitance2: 14.08509
+Capacitance3: 13.98749
+ 
+Capacitance0: 13.93638
+Capacitance1: 13.34472
+Capacitance2: 14.08583
+Capacitance3: 13.98874
+ 
+Capacitance0: 13.93435
+Capacitance1: 13.34536
+Capacitance2: 14.08483
+Capacitance3: 13.98614
+ 
+Capacitance0: 14.19511
+Capacitance1: 13.57794
+Capacitance2: 14.36113
+Capacitance3: 14.22013
+ 
+Capacitance0: 14.19678
+Capacitance1: 13.57887
+Capacitance2: 14.36136
+Capacitance3: 14.22024
+ 
+Capacitance0: 14.19499
+Capacitance1: 13.57845
+Capacitance2: 14.36137
+Capacitance3: 14.21955
+ 
+Capacitance0: 14.19616
+Capacitance1: 13.57877
+Capacitance2: 14.36215
+Capacitance3: 14.22107
+ 
+Capacitance0: 14.19748
+Capacitance1: 13.57811
+Capacitance2: 14.36202
+Capacitance3: 14.22034
+ 
+Capacitance0: 14.19686
+Capacitance1: 13.57795
+Capacitance2: 14.36257
+Capacitance3: 14.21898
+ 
+Capacitance0: 14.19732
+Capacitance1: 13.57962
+Capacitance2: 14.36202
+Capacitance3: 14.22009
+ 
+Capacitance0: 14.19401
+Capacitance1: 13.57716
+Capacitance2: 14.35922
+Capacitance3: 14.21608
+ 
+Capacitance0: 14.19711
+Capacitance1: 13.57858
+Capacitance2: 14.36199
+Capacitance3: 14.21939
+ 
+Capacitance0: 14.46925
+Capacitance1: 13.83313
+Capacitance2: 14.66541
+Capacitance3: 14.48156
+ 
+Capacitance0: 14.49397
+Capacitance1: 13.85767
+Capacitance2: 14.69645
+Capacitance3: 14.50801
+ 
+Capacitance0: 14.49177
+Capacitance1: 13.85933
+Capacitance2: 14.69271
+Capacitance3: 14.51012
+ 
+Capacitance0: 14.49271
+Capacitance1: 13.86070
+Capacitance2: 14.69471
+Capacitance3: 14.50773
+ 
+Capacitance0: 14.49287
+Capacitance1: 13.85899
+Capacitance2: 14.69557
+Capacitance3: 14.51098
+ 
+Capacitance0: 14.49268
+Capacitance1: 13.85955
+Capacitance2: 14.69383
+Capacitance3: 14.50863
+ 
+Capacitance0: 14.49398
+Capacitance1: 13.85960
+Capacitance2: 14.69557
+Capacitance3: 14.51081
+ 
+Capacitance0: 14.49198
+Capacitance1: 13.85988
+Capacitance2: 14.69466
+Capacitance3: 14.51056
+ 
+Capacitance0: 14.49425
+Capacitance1: 13.86098
+Capacitance2: 14.69648
+Capacitance3: 14.50997
+ 
+Capacitance0: 14.79922
+Capacitance1: 14.13820
+Capacitance2: 15.02319
+Capacitance3: 14.80227
+ 
+Capacitance0: 14.79999
+Capacitance1: 14.14252
+Capacitance2: 15.02893
+Capacitance3: 14.80560
+ 
+Capacitance0: 14.80075
+Capacitance1: 14.14057
+Capacitance2: 15.02838
+Capacitance3: 14.80736
+ 
+Capacitance0: 14.80225
+Capacitance1: 14.14099
+Capacitance2: 15.02816
+Capacitance3: 14.80621
+ 
+Capacitance0: 14.80293
+Capacitance1: 14.14057
+Capacitance2: 15.02915
+Capacitance3: 14.80496
+ 
+Capacitance0: 14.80296
+Capacitance1: 14.14294
+Capacitance2: 15.02950
+Capacitance3: 14.80766
+ 
+Capacitance0: 14.80240
+Capacitance1: 14.14049
+Capacitance2: 15.03081
+Capacitance3: 14.80704
+ 
+Capacitance0: 14.80243
+Capacitance1: 14.14102
+Capacitance2: 15.02581
+Capacitance3: 14.80489
+ 
+Capacitance0: 14.80306
+Capacitance1: 14.13999
+Capacitance2: 15.02868
+Capacitance3: 14.80629
+ 
