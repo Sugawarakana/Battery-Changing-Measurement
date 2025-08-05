@@ -33,6 +33,7 @@ THE SOFTWARE.
 */
 
 #include "AD7746.h"
+#include "Wire.h"
 
 /** Default constructor, uses default I2C address.
  * @see AD7746_DEFAULT_ADDRESS
@@ -50,6 +51,16 @@ AD7746::AD7746(uint8_t address) {
     devAddr = address;
 }
 
+AD7746::AD7746(TwoWire* wire) {
+    devAddr = AD7746_DEFAULT_ADDRESS;
+    _wire = wire;
+}
+
+AD7746::AD7746(uint8_t address, TwoWire* wire) {
+    devAddr = address;
+    _wire = wire;
+}
+
 /** Power on and prepare for general usage.
  */
 void AD7746::initialize() {
@@ -61,7 +72,7 @@ void AD7746::initialize() {
  * @return True if connection is valid, false otherwise
  */
 bool AD7746::testConnection() {
-    if (I2Cdev::readByte(devAddr, AD7746_RA_STATUS, buffer)) {
+    if (I2Cdev::readByte(devAddr, AD7746_RA_STATUS, buffer, 0, _wire)) {
         return true;
     }
     return false;
@@ -77,16 +88,16 @@ void AD7746::reset() {
 #endif    
 
 #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-    Wire.beginTransmission(devAddr);
-    Wire.send((uint8_t) AD7746_RESET); // send reset
+    _wire->beginTransmission(devAddr);
+    _wire->send((uint8_t) AD7746_RESET); // send reset
 #elif (I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100)
-    Wire.beginTransmission(devAddr);
-    Wire.write((uint8_t) AD7746_RESET); // send reset
+    _wire->beginTransmission(devAddr);
+    _wire->write((uint8_t) AD7746_RESET); // send reset
 #endif
 #if ((I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO < 100) || I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_NBWIRE)
-    Wire.endTransmission();
+    _wire->endTransmission();
 #elif (I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE && ARDUINO >= 100)
-    Wire.endTransmission();
+    _wire->endTransmission();
 #endif
     
 #ifdef I2CDEV_SERIAL_DEBUG
@@ -99,40 +110,46 @@ delay(1); //wait a tad for reboot
 
 uint32_t AD7746::getCapacitance() {
     uint32_t capacitance;
-    I2Cdev::readBytes(devAddr, 0, 4, buffer);
+    I2Cdev::readBytes(devAddr, 0, 4, buffer, 0, _wire); // 传递 _wire
     capacitance = ((uint32_t)buffer[1] << 16) | ((uint32_t)buffer[2] << 8) | (uint32_t)buffer[3];
-    
     return capacitance;
 }
 
+uint32_t AD7746::readStatusRegister() {
+    uint32_t status;
+    I2Cdev::readBytes(devAddr, 0, 11, buffer, 0, _wire); // 传递 _wire
+    status = buffer[10];
+    return status;
+}
 
 void AD7746::writeCapSetupRegister(uint8_t data) {
-    I2Cdev::writeByte(devAddr, AD7746_RA_CAP_SETUP, data);
+    I2Cdev::writeByte(devAddr, AD7746_RA_CAP_SETUP, data, _wire); // 传递 _wire
 }
 
 void AD7746::writeVtSetupRegister(uint8_t data) {
-    I2Cdev::writeByte(devAddr, AD7746_RA_VT_SETUP, data);
+    I2Cdev::writeByte(devAddr, AD7746_RA_VT_SETUP, data, _wire); // 传递 _wire
 }
-
 
 void AD7746::writeExcSetupRegister(uint8_t data) {
-    I2Cdev::writeByte(devAddr, AD7746_RA_EXC_SETUP, data);
+    I2Cdev::writeByte(devAddr, AD7746_RA_EXC_SETUP, data, _wire); // 传递 _wire
 }
-
 
 void AD7746::writeConfigurationRegister(uint8_t data) {
-    I2Cdev::writeByte(devAddr, AD7746_RA_CONFIGURATION, data);
+    I2Cdev::writeByte(devAddr, AD7746_RA_CONFIGURATION, data, _wire); // 传递 _wire
 }
 
-
 void AD7746::writeCapDacARegister(uint8_t data) {
-    I2Cdev::writeByte(devAddr, AD7746_RA_CAP_DAC_A, data);
+    I2Cdev::writeByte(devAddr, AD7746_RA_CAP_DAC_A, data, _wire); // 传递 _wire
 }
 
 void AD7746::writeCapDacBRegister(uint8_t data) {
-    I2Cdev::writeByte(devAddr, AD7746_RA_CAP_DAC_B, data);
+    I2Cdev::writeByte(devAddr, AD7746_RA_CAP_DAC_B, data, _wire); // 传递 _wire
 }
 
 void AD7746::write_register(uint8_t addr,uint8_t data) {
-    I2Cdev::writeByte(devAddr, addr, data);
+    I2Cdev::writeByte(devAddr, addr, data, _wire); // 传递 _wire
 }
+
+// void AD7746::write_register(uint8_t addr,uint8_t data) {
+//     I2Cdev::writeByte(devAddr, addr, data);
+// }
