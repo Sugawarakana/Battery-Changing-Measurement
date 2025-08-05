@@ -36,7 +36,7 @@ THE SOFTWARE.
 #define _AD7746_H_
 
 #include "I2Cdev.h"
-
+#include <Wire.h>
 
 #define AD7746_ADDRESS           0x48
 #define AD7746_DEFAULT_ADDRESS   AD7746_ADDRESS           
@@ -163,13 +163,14 @@ class AD7746 {
     public:
         AD7746();
         AD7746(uint8_t address);
-
+        AD7746(TwoWire* wire);
+        AD7746(uint8_t address, TwoWire* wire);
         void initialize();
         bool testConnection();
         void reset(); 
 
         uint32_t getCapacitance();
-    
+        uint32_t readStatusRegister();
         void writeCapSetupRegister(uint8_t data);
         void writeVtSetupRegister(uint8_t data);
         void writeExcSetupRegister(uint8_t data);
@@ -182,6 +183,7 @@ class AD7746 {
     private:
         uint8_t devAddr;
         uint8_t buffer[19];
+        TwoWire *_wire;
 };
 
 #endif /* _AD7746_H_ */
