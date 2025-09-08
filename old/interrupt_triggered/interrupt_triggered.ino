@@ -117,44 +117,7 @@ void readSingleCapacitance() {
 
 // **Function to get filtered capacitance value using median filtering**
 void readFilteredCapacitance() {
-    // Result r;
 
-    // uint32_t temp = 0;
-    // // Take multiple readings for noise reduction
-    // for (int i = 0; i < numReadings; i++) {
-         
-    //     tca_select(0);
-    //     capSensor.writeCapSetupRegister(AD7746_CAPEN);
-    //     wait();
-    //     // int_bf = digitalRead(interruptPin);
-    //     // status_bf = capSensor.readStatusRegister();
-
-
-    //     temp = capSensor.getCapacitance();
-        
-        
-    //     readings[0][i] = (float) temp * (4.00 / 0x800000) + 4.00;
-
-    //     capSensor.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
-
-    //     // int_af = digitalRead(interruptPin);
-    //     // status_af = capSensor.readStatusRegister();
-
-    //     wait();
-    //     temp = capSensor.getCapacitance();
-    //     readings[1][i] = (float) temp * (4.00 / 0x800000) + 4.00;
-    //     capSensor.writeCapSetupRegister(0);
-    //     tca_select(1);
-    //     capSensor.writeCapSetupRegister(AD7746_CAPEN);
-    //     wait();
-    //     temp = capSensor.getCapacitance();
-    //     readings[2][i] = (float) temp * (4.00 / 0x800000) + 4.00;
-    //     capSensor.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
-    //     wait();
-    //     temp = capSensor.getCapacitance();
-    //     readings[3][i] = (float) temp * (4.00 / 0x800000) + 4.00;
-    //     capSensor.writeCapSetupRegister(0);
-    // }
 
     // Sort the readings to get the median
 
@@ -197,15 +160,7 @@ void readFilteredCapacitance() {
         }
         fMean[i] = fSum[i] / count[i];
     }
-    // r.cap0 = fMean[0];
-    // r.cap1 = fMean[1];
-    // r.cap2 = fMean[2];
-    // r.cap3 = fMean[3];
-    // r.ps = int_bf;
-    // r.ps1 = int_af;
-    // r.ps2 = status_bf;
-    // r.ps3 = status_af;
-    // r.count0 = count[0];
+
     Serial.print("Capacitance0: ");
     Serial.println(fMean[0], 8);
     Serial.print("Capacitance1: ");
@@ -215,19 +170,7 @@ void readFilteredCapacitance() {
     Serial.print("Capacitance3: ");
     Serial.println(fMean[3], 8);
     Serial.println(" ");
-    // fMean = fSum / count;
-    // r.mean = fMean;
-    // r.r0 = readings[0];
-    // r.r1 = readings[1];
-    // r.r2 = readings[2];
-    // r.r3 = readings[3];
-    // r.r4 = readings[4];
-    // r.r5 = readings[5];
-    // r.r6 = readings[6];
-    // r.r7 = readings[7];
-    // r.std_dev = std_dev;
-    // r.count = count;
-    // return r;
+
 }
 
 
@@ -254,83 +197,10 @@ void setup() {
 
 void loop() {
    
-    // tca_select(0);
-    // capSensor.writeCapSetupRegister(AD7746_CAPEN);
-    // wait();
-    // Result capacitance0 = readFilteredCapacitance();
-    // capSensor.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
-    // wait();
-    // Result capacitance1 = readFilteredCapacitance();
-    // capSensor.writeCapSetupRegister(0);
-
-    // tca_select(1);
-    // capSensor.writeCapSetupRegister(AD7746_CAPEN);
-    // wait();
-    // Result capacitance2 = readFilteredCapacitance();
-    // capSensor.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
-    // wait();
-    // Result capacitance3 = readFilteredCapacitance();
-    // capSensor.writeCapSetupRegister(0);
-
-    // // Serial.println(capacitance0.count);
-    // Serial.print("Capacitance0: ");
-    // Serial.print(capacitance0.mean, 8);
-    // Serial.println(" pF");
-    // // Serial.print(capacitance0.r0, 8);
-    // // Serial.println(" pF");
-    // // Serial.print(capacitance0.r1, 8);
-    // // Serial.println(" pF");
-    // // Serial.print(capacitance0.r2, 8);
-    // // Serial.println(" pF");
-    // // Serial.print(capacitance0.r3, 8);
-    // // Serial.println(" pF");
-    // // Serial.print(capacitance0.r4, 8);
-    // // Serial.println(" pF");
-    // // Serial.print(capacitance0.r5, 8);
-    // // Serial.println(" pF");
-    // // Serial.print(capacitance0.r6, 8);
-    // // Serial.println(" pF");
-    // // Serial.print(capacitance0.r7, 8);
-    // // Serial.println(" pF");
-
-
-    // Serial.print("Capacitance1: ");
-    // Serial.print(capacitance1.mean, 8);
-    // Serial.println(" pF");
-    
-    // Serial.print("Capacitance2: ");
-    // Serial.print(capacitance2.mean, 8);
-    // Serial.println(" pF");
-    // Serial.print("Capacitance3: ");
-    // Serial.print(capacitance3.mean, 8);
-    // Serial.println(" pF");
-    // Serial.println(" ");
-
-    // // Serial.print("std_dev");
-    // // Serial.println(capacitance0.std_dev, 8);
-    // // Serial.println(capacitance1.std_dev, 8);
-    // // Serial.println(capacitance2.std_dev, 8);
-    // // Serial.println(capacitance3.std_dev, 8);
-    // Serial.print(capacitance1.r0, 8);
-    // Serial.println(" pF");
-    // Serial.print(capacitance1.r1, 8);
-    // Serial.println(" pF");
-    // Serial.print(capacitance1.r2, 8);
-    // Serial.println(" pF");
-    // Serial.print(capacitance1.r3, 8);
-    // Serial.println(" pF");
-    // Serial.print(capacitance1.r4, 8);
-    // Serial.println(" pF");
-    // Serial.print(capacitance1.r5, 8);
-    // Serial.println(" pF");
-    // Serial.print(capacitance1.r6, 8);
-    // Serial.println(" pF");
-    // Serial.print(capacitance1.r7, 8);
-    // Serial.println(" pF");
     noInterrupts();
     bool isDataReady_0 = newDataAvailable_0;
     bool isDataReady_1 = newDataAvailable_1;
-    interrupts(); // 立即重新启用中断
+    interrupts(); 
  
     if (reading_count == 4 * numReadings){
         // Enough readings for data processing
@@ -342,39 +212,6 @@ void loop() {
         readSingleCapacitance();
         reading_count += 1;
     }
-    // if (isDataReady_0 && ((reading_count % 4) < 2)){
-    //     readSingleCapacitance();
-    //     reading_count += 1;
-    // }
-    // if (isDataReady_1 && ((reading_count % 4) >= 2)){
-    //     readSingleCapacitance();
-    //     reading_count += 1;
-    // }
-    // Result capacitances = readFilteredCapacitance();
-
-    // Serial.println(capacitances.count0);
-    // Serial.print("Capacitance0: ");
-    // Serial.print(capacitances.cap0, 8);
-    // Serial.println(" pF");
-    // Serial.print("Capacitance1: ");
-    // Serial.print(capacitances.cap1, 8);
-    // Serial.println(" pF");
-    // Serial.print("Capacitance2: ");
-    // Serial.print(capacitances.cap2, 8);
-    // Serial.println(" pF");
-    // Serial.print("Capacitance3: ");
-    // Serial.print(capacitances.cap3, 8);
-    // Serial.println(" pF");
-    // Serial.print("INT: ");
-    // Serial.println(capacitances.ps);
-    // Serial.print("INT_after: ");
-    // Serial.println(capacitances.ps1);
-    // Serial.print("status_bf: ");
-    // Serial.println(capacitances.ps2);
-    // Serial.print("status_after: ");
-    // Serial.println(capacitances.ps3);
-    // Serial.println(" ");
-
-    // delay(50);
+  
 }
 

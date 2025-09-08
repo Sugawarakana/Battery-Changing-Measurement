@@ -15,6 +15,7 @@ volatile bool select_B_0 = false;
 int reading_count = 0; // To record the status of array
 const int numReadings = 16; // Number of samples for mean filtering
 const int numCaps = 4;
+volatile uint8_t dacValue = 30;
 float readings[numCaps][numReadings];
 float fReadings[numCaps][numReadings];
 TwoWire Wire1(6, 7);
@@ -53,12 +54,9 @@ void sensor0_init() {
 //     Serial.println("Continuous Conversion Mode Enabled");
 
 //     // Configure Cap DAC to shift the reference to 8 pF (so we measure 4 - 12 pF)
-    uint8_t dacValue = 90;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
+    // uint8_t dacValue = 60;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
     capSensor0.writeCapDacARegister(dacValue | AD7746_DACAEN); // Enable Cap DAC A
-//     Serial.println("Cap DAC A Configured to 8 pF Offset");
-//     Serial.println("AD7746 Configuration Complete. Reading Capacitance...");
-    // capSensor0.writeCapSetupRegister(0);
-         // Enable capacitance measurement mode
+
     capSensor0.writeCapSetupRegister(AD7746_CAPEN);
     // capSensor0.writeCapSetupRegister(0);
     
@@ -91,7 +89,7 @@ void sensor1_init() {
     // Serial.println("Continuous Conversion Mode Enabled");
 
     // Configure Cap DAC to shift the reference to 8 pF (so we measure 4 - 12 pF)
-    uint8_t dacValue = 90;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
+    // uint8_t dacValue = 60;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
     capSensor1.writeCapDacARegister(dacValue | AD7746_DACAEN); // Enable Cap DAC A
     // Serial.println("Cap DAC A Configured to 8 pF Offset");
 
@@ -112,7 +110,7 @@ void readSingleCapacitance() {
     else {
         temp = capSensor1.getCapacitance();
     }
-    readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 8.00;
+    readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
     // capSensor0.writeCapSetupRegister(0);
     // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
     // newDataAvailable_0 = false;
@@ -140,7 +138,6 @@ void readSingleCapacitance() {
             newDataAvailable_1 = false;
             break;
         case 3:
-            
             capSensor0.writeCapSetupRegister(AD7746_CAPEN);
             capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
             newDataAvailable_1 = false;
@@ -150,29 +147,6 @@ void readSingleCapacitance() {
 }
 
 
-// void readSingleCapacitance1() {
-//     // delay(100);
-//     uint32_t temp = capSensor1.getCapacitance();
-//     int cap_num = reading_count % numCaps;
-//     int read_num = reading_count / numCaps;
-
-//     readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 4.00;
-//     // capSensor1.writeCapSetupRegister(0);
-//     // capSensor0.writeCapSetupRegister(AD7746_CAPEN);
-//     // newDataAvailable_1 = false;
-//     // switch (select_B_1){
-//     //     case 0:
-//     //         capSensor1.writeCapSetupRegister(AD7746_CAPEN);
-//     //         // newDataAvailable_1 = false;
-//     //         select_B_1 = true;
-//     //         break;
-//     //     case 1:
-//     //         capSensor1.writeCapSetupRegister(AD7746_CAPEN);
-//     //         // newDataAvailable_1 = false;
-//     //         select_B_1 = false;
-//     //         break;
-//     // }
-// }
 
 // **Function to get filtered capacitance value using median filtering**
 void readFilteredCapacitance() {
@@ -225,25 +199,6 @@ void readFilteredCapacitance() {
         }
         fMean[i] = fSum[i] / count[i];
     }
-    // Serial.println("count0: ");
-    // for (int k = 0; k < 8; k++) {
-    //     Serial.println(readings[1][k], 8);
-    // }
-    // Serial.println("Cap0");
-    // for (int k = 0; k < 16; k++) {
-    //     Serial.println(readings[0][k], 8);
-    // }
-    // Serial.println("Cap1");
-    // for (int k = 0; k < 16; k++) {
-    //     Serial.println(readings[1][k], 8);
-    // }
-    // Serial.println(mean[0]);
-    // Serial.println(mean[1]);
-    
-    // Serial.print("Variance for Cap2: ");
-    // Serial.println(variance[2], 5);
-    // Serial.print("Variance for Cap3: ");
-    // Serial.println(variance[3], 5);
 
     Serial.print("Capacitance0: ");
     Serial.println(fMean[0], 5);
@@ -254,11 +209,6 @@ void readFilteredCapacitance() {
     Serial.print("Capacitance3: ");
     Serial.println(fMean[3], 5);
     Serial.println(" ");
-    //  for (int i = 0; i < numReadings; i++){
-    //     Serial.println(readings[1][i]);
-    // }
-    // Serial.println(count[0]);
-    // Serial.println(count[1]);
 }
 
 
@@ -274,7 +224,6 @@ void setup() {
 
     sensor0_init();
     sensor1_init();
-    // delay(20);
 }
    
 
@@ -287,6 +236,18 @@ void loop() {
     bool isDataReady_0 = newDataAvailable_0;
     bool isDataReady_1 = newDataAvailable_1;
     interrupts(); //  restart interrupts
+
+    if (Serial.available() > 0) {
+        int incomingValue = Serial.parseInt();
+        while (Serial.available()) {
+            Serial.read(); 
+        }
+        dacValue = incomingValue;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
+        capSensor0.writeCapDacARegister(dacValue | AD7746_DACAEN);
+        capSensor1.writeCapDacARegister(dacValue | AD7746_DACAEN);
+        Serial.print("Offset changed to ");
+        Serial.print(incomingValue);
+    }
 
     // Serial.println("working");
     
@@ -321,5 +282,3 @@ void loop() {
         // Serial.println(reading_count);
     }
 }
-
-// problem: single no interrupt

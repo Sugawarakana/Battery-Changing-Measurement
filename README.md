@@ -1,6 +1,10 @@
 # Introduction
 
-This is a repository for Battery Control Lab (BCL). Currently updating.  
+This is the official repository for the Battery Control Lab (BCL), currently undergoing updates.
+
+The latest codes are available in the folder 'latest' (last updated September 8, 2024).
+
+You can input a number via serial to adjust the capacitance offset. Each unit changes the offset by 0.133858 pF (default: 30 units, providing an adjustable range of 4-8 pF).
 
 In the Battery Control Lab, we aim to keep tracking the status of batteries in electric vehicles when charging or discharging. The common idea is that the thickness of battery varies when power changes. However, precise distance sensors are relatively expensive, may not work well for industrial applications. Thus, we're trying to convert length to another physical quantity that can be economically measured.  
 
