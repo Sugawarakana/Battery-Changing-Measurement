@@ -17,17 +17,21 @@ The ongoing work is divided into several steps:
 3. Let microprocessor connect two AD7746 chips at the same address, enabling 4-points reading;
 4. Use 4-points reading pad to calibrate the relationship between *d* and *C*;
 5. Optimize the delay and error;
-6. ..
+6. Monitering the charging and discharging data.
 
 # Devices used
 
-Laptop + Maker Pi Pico / Raspberry Pi 3 Model B  
+Laptop + Maker Pi Pico / Raspberry Pi 3 Model B (old)  
 
 2 × AD7746 Capacitance sensors  
 
-1 × TCA9548A I2C Multiplexer  
+1 × TCA9548A I2C Multiplexer (old)  
 
-Wires  
+Wires (old)  
+
+Shielded wires
+
+Copper foil shield
 
 Poron capacitor array  
 
@@ -41,21 +45,27 @@ Computer and Pico Pi (or a single Raspberry Pi instead) are used for data proces
 
 **Raspberry Pi 3 Model B**  
 
-Raspberry Pi-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor  
+Raspberry Pi-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor (old)
 
 **Laptop + Maker Pi Pico**  
 
-laptop-(usb-microusb)-Pico-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor  
+Computer-(usb-microusb)-Pico-(wire)-TCA9548A-(wire)-AD7746-(wire)-wire-capacitor (old)
+
+**Computer-(usb-microusb)-Pico-(double i2c wire)-AD7746-(wire)-wire-capacitor (latest)**
 
 Communication via serial monitor  
 
 # AD7746 guides
 
-(Updating)
+The AD7746 has a fixed default I2C address of 0x48. Therefore, using multiple sensors requires either multiple I2C channels or an I2C address multiplexer. However, implementing the latter led to significant fluctuations in readings, prompting its abandonment.  
+
+The datasheet is in the **guides** folder.  
+
+Single conversion means reading a single data point from the registers, then clearing the configuration register. If you want it to run continuously, continuous conversion might be an option. However, weird, unstable data might be obtained when different sensors work together. Therefore, rewriting the configuration register after every conversion might be the most reliable approach.
 
 # TCA9548A guides
 
-Used to split the data and clock line (SDA & SCL). The datasheet is in the **guides** folder. Set the switch by send a 8-bit data to the designated address.
+Used to split the data and clock line (SDA & SCL). The datasheet is in the **guides** folder. Set the switch by send a 8-bit data to the designated address. Default address 0x70.
 
 # Fixture notation
 
@@ -77,11 +87,11 @@ Tighten the screws evenly by making sure the Keyence readings close to each othe
 
 # Sampling delay and standard error
 
-(Updating)
+Sampling delay is set to 62.0 ms, with a minimized RMS Noise of 1.5 aF/sqrt(Hz) with respect to the datasheet. In a real experimental environment, the variance was 1.20E-07 pF^2.
 
 # Data Logging
 
-(Updating)
+The Pico Pi outputs serial data via a micro USB cable. The Python script capacitance_log.py utilizes a serial protocol for data transmission. The default COM port is COM4, with a baud rate of 115200. The measured capacitances and their corresponding timestamps are then stored in capacitance_data.csv
 
 # Remote settings
 
@@ -95,8 +105,10 @@ access via mstsc
 
 # About this folder
 
-Monitor.py is for Raspberry Pi  
+Monitor.py is for Raspberry Pi (old)  
 
-Data_log.py is for Pico Pi data logging  
+Data_log.py is for Pico Pi data logging (old)  
 
-Monitor.ino is for Pico Pi
+Monitor.ino is for Pico Pi (old)  
+
+**doubleI2C.ino is for Pico Pi 4 sensor stable reading (latest)**
