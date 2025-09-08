@@ -1,6 +1,6 @@
 # Introduction
 
-This is the official repository for the Battery Control Lab (BCL), currently undergoing updates.
+This is the repository for a battery changing measurement project in the Battery Control Laboratory (BCL), currently undergoing updates.
 
 The latest codes are available in the folder 'latest' (last updated September 8, 2024).
 
