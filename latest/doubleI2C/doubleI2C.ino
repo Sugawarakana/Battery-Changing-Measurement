@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include "AD7746.h"
-
+//#include <FlexWire.h>
 
 // #define TCA9548A_ADDR 0x70 // Address of multiplexer
 #define AD7746_ADDR 0x48 // Address of sensor
@@ -18,7 +18,11 @@ const int numCaps = 4;
 volatile uint8_t dacValue = 30;
 float readings[numCaps][numReadings];
 float fReadings[numCaps][numReadings];
-TwoWire Wire1(6, 7);
+//TwoWire Wire1(6, 7);
+
+// Define I2C1 pins 
+#define SDA1 6
+#define SCL1 7
 
 void dataReadyISR_0() {
     newDataAvailable_0 = true;
@@ -214,6 +218,9 @@ void readFilteredCapacitance() {
 
 void setup() {
     Serial.begin(115200);
+    Serial.println("starting");
+    Wire1.setSDA(SDA1); 
+    Wire1.setSCL(SCL1);
     Wire.begin();
     Wire1.begin();
 
