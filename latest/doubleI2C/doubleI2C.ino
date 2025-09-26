@@ -2,7 +2,7 @@
 #include "AD7746.h"
 #include "RPi_Pico_TimerInterrupt.h"
 //#include <FlexWire.h>
-#define TIMER_INTERVAL_MS 25L
+#define TIMER_INTERVAL_MS 125L
 // #define TCA9548A_ADDR 0x70 // Address of multiplexer
 #define AD7746_ADDR 0x48 // Address of sensor
 
@@ -126,30 +126,30 @@ void readSingleCapacitance() {
     // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
     newDataAvailable_0 = false;
     switch (cap_num){
-        case 0:
-            capSensor0.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
+        case 3:
+            capSensor0.writeCapSetupRegister(AD7746_CAPEN );
             capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
            // newDataAvailable_0 = false;
             // Serial.println("0");
             // select_B_0 = true;
             break;
-        case 1:
+        case 0:
             // capSensor0.writeCapSetupRegister(0);
             // tca_select(1);
-            capSensor0.writeCapSetupRegister(AD7746_CAPEN);
+            capSensor0.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
             capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
             
            // newDataAvailable_0 = false;
             // Serial.println("1");
             // select_B_0 = false;
             break;
-        case 2:
-            capSensor1.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
+        case 1:
+            capSensor1.writeCapSetupRegister(AD7746_CAPEN );
             capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
             //newDataAvailable_1 = false;
             break;
-        case 3:
-            capSensor1.writeCapSetupRegister(AD7746_CAPEN);
+        case 2:
+            capSensor1.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
             capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
             //newDataAvailable_1 = false;
             break;
