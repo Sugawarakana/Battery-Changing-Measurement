@@ -1,15 +1,21 @@
 #include <Wire.h>
 #include "AD7746.h"
+#include "RPi_Pico_TimerInterrupt.h"
 //#include <FlexWire.h>
-
+#define TIMER_INTERVAL_MS 25L
 // #define TCA9548A_ADDR 0x70 // Address of multiplexer
 #define AD7746_ADDR 0x48 // Address of sensor
 
+// Define I2C1 pins 
+#define SDA1 6
+#define SCL1 7
+
+RPI_PICO_Timer ITimer(0);
 int total = 0;
 const int Pin3_AD0 = 15;
 const int Pin2_AD1 = 16;
 volatile bool newDataAvailable_0 = false;
-volatile bool newDataAvailable_1 = false;
+//volatile bool newDataAvailable_1 = false;
 volatile bool select_B_0 = false;
 // volatile bool select_B_1 = false;
 int reading_count = 0; // To record the status of array
@@ -20,16 +26,17 @@ float readings[numCaps][numReadings];
 float fReadings[numCaps][numReadings];
 //TwoWire Wire1(6, 7);
 
-// Define I2C1 pins 
-#define SDA1 6
-#define SCL1 7
 
-void dataReadyISR_0() {
+
+//void dataReadyISR_0()
+bool TimerHandler(struct repeating_timer *t) 
+{
     newDataAvailable_0 = true;
+    return true;
 }
-void dataReadyISR_1() {
-    newDataAvailable_1 = true;
-}
+// void dataReadyISR_1() {
+//     newDataAvailable_1 = true;
+// }
 
 
 AD7746 capSensor0(&Wire);  // I2C0
@@ -117,34 +124,34 @@ void readSingleCapacitance() {
     readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
     // capSensor0.writeCapSetupRegister(0);
     // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
-    // newDataAvailable_0 = false;
+    newDataAvailable_0 = false;
     switch (cap_num){
         case 0:
             capSensor0.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
             capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            newDataAvailable_0 = false;
+           // newDataAvailable_0 = false;
             // Serial.println("0");
             // select_B_0 = true;
             break;
         case 1:
             // capSensor0.writeCapSetupRegister(0);
             // tca_select(1);
-            capSensor1.writeCapSetupRegister(AD7746_CAPEN);
-            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+            capSensor0.writeCapSetupRegister(AD7746_CAPEN);
+            capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
             
-            newDataAvailable_0 = false;
+           // newDataAvailable_0 = false;
             // Serial.println("1");
             // select_B_0 = false;
             break;
         case 2:
             capSensor1.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
             capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            newDataAvailable_1 = false;
+            //newDataAvailable_1 = false;
             break;
         case 3:
-            capSensor0.writeCapSetupRegister(AD7746_CAPEN);
-            capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            newDataAvailable_1 = false;
+            capSensor1.writeCapSetupRegister(AD7746_CAPEN);
+            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+            //newDataAvailable_1 = false;
             break;
     }
 
@@ -217,20 +224,31 @@ void readFilteredCapacitance() {
 
 
 void setup() {
+    
     Serial.begin(115200);
+    while (!Serial) {
+    ; // Wait for serial port to connect. Needed for native USB port only
+    }
     Serial.println("starting");
     Wire1.setSDA(SDA1); 
     Wire1.setSCL(SCL1);
     Wire.begin();
     Wire1.begin();
 
-    pinMode(Pin3_AD0, INPUT_PULLUP);
-    pinMode(Pin2_AD1, INPUT_PULLUP);
-    attachInterrupt(digitalPinToInterrupt(Pin3_AD0), dataReadyISR_0, FALLING);
-    attachInterrupt(digitalPinToInterrupt(Pin2_AD1), dataReadyISR_1, FALLING);
-
     sensor0_init();
     sensor1_init();
+
+    // pinMode(Pin3_AD0, INPUT_PULLUP);
+    // pinMode(Pin2_AD1, INPUT_PULLUP);
+    // attachInterrupt(digitalPinToInterrupt(Pin3_AD0), dataReadyISR_0, FALLING);
+    // attachInterrupt(digitalPinToInterrupt(Pin2_AD1), dataReadyISR_1, FALLING);
+
+  // Interval in unsigned long microseconds
+  if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
+    Serial.println("Starting ITimer OK, millis() = " + String(millis()));
+  else
+    Serial.println("Can't set ITimer. Select another freq. or timer");
+
 }
    
 
@@ -241,7 +259,7 @@ void loop() {
 
     noInterrupts(); // 
     bool isDataReady_0 = newDataAvailable_0;
-    bool isDataReady_1 = newDataAvailable_1;
+    //bool isDataReady_1 = newDataAvailable_1;
     interrupts(); //  restart interrupts
 
     if (Serial.available() > 0) {
@@ -279,13 +297,13 @@ void loop() {
         // Serial.println("A");
         // Serial.println(reading_count);
     }
-    if (isDataReady_1){
-        readSingleCapacitance(); 
-        reading_count += 1;
-        newDataAvailable_1 = false;
-        // uint32_t status = capSensor1.readStatusRegister();
-        // Serial.print(status);   
-        // Serial.print("B");
-        // Serial.println(reading_count);
-    }
+    // if (isDataReady_1){
+    //     readSingleCapacitance(); 
+    //     reading_count += 1;
+    //     newDataAvailable_1 = false;
+    //     // uint32_t status = capSensor1.readStatusRegister();
+    //     // Serial.print(status);   
+    //     // Serial.print("B");
+    //     // Serial.println(reading_count);
+    // }
 }
