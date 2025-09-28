@@ -2,7 +2,7 @@
 #include "AD7746.h"
 #include "RPi_Pico_TimerInterrupt.h"
 //#include <FlexWire.h>
-#define TIMER_INTERVAL_MS 25L
+#define TIMER_INTERVAL_MS 50L
 // #define TCA9548A_ADDR 0x70 // Address of multiplexer
 #define AD7746_ADDR 0x48 // Address of sensor
 
@@ -11,11 +11,12 @@
 #define SCL1 7
 
 RPI_PICO_Timer ITimer(0);
-int total = 0;
+uint32_t total = 0;
 const int Pin3_AD0 = 15;
 const int Pin2_AD1 = 16;
+volatile bool TimeToStartConversion = false;
 volatile bool newDataAvailable_0 = false;
-//volatile bool newDataAvailable_1 = false;
+volatile bool newDataAvailable_1 = false;
 volatile bool select_B_0 = false;
 // volatile bool select_B_1 = false;
 int reading_count = 0; // To record the status of array
@@ -28,15 +29,19 @@ volatile float readings[numCaps][numReadings];
 
 
 
-//void dataReadyISR_0()
+//
 bool TimerHandler(struct repeating_timer *t) 
 {
-    newDataAvailable_0 = true;
+    TimeToStartConversion=true;
     return true;
 }
-// void dataReadyISR_1() {
-//     newDataAvailable_1 = true;
-// }
+
+void dataReadyISR_0(){
+    newDataAvailable_0 = true;
+}
+void dataReadyISR_1() {
+     newDataAvailable_1 = true;
+}
 
 
 AD7746 capSensor0(&Wire);  // I2C0
@@ -110,59 +115,6 @@ void sensor1_init() {
 }
 
 
-void readSingleCapacitance() {
-    uint32_t temp=0;
-    
-    int cap_num = reading_count % numCaps;
-    int read_num = reading_count / numCaps;
-
-    newDataAvailable_0 = false;
-    switch (cap_num){
-        case 3:
-            temp = capSensor1.getCapacitance();
-           // Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
-
-            capSensor0.writeCapSetupRegister(AD7746_CAPEN );
-            capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-           // newDataAvailable_0 = false;
-            // Serial.println("0");
-            // select_B_0 = true;
-            break;
-
-        case 0:
-            temp =capSensor0.getCapacitance();
-            capSensor1.writeCapSetupRegister(AD7746_CAPEN );
-            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            //newDataAvailable_1 = false;
-            break;
-        case 1:
-            temp = capSensor1.getCapacitance();
-            // Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
-
-            capSensor0.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
-            capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            //newDataAvailable_1 = false;
-            break;
-
-        case 2:
-            temp = capSensor0.getCapacitance();
-            // capSensor0.writeCapSetupRegister(0);
-            // tca_select(1);
-            capSensor1.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
-            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            
-           // newDataAvailable_0 = false;
-            // Serial.println("1");
-            // select_B_0 = false;
-            break;
-    }
-    //Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
-    readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
-    // capSensor0.writeCapSetupRegister(0);
-    // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
-
-
-}
 
 
 
@@ -267,10 +219,10 @@ void setup() {
     sensor0_init();
     sensor1_init();
 
-    // pinMode(Pin3_AD0, INPUT_PULLUP);
-    // pinMode(Pin2_AD1, INPUT_PULLUP);
-    // attachInterrupt(digitalPinToInterrupt(Pin3_AD0), dataReadyISR_0, FALLING);
-    // attachInterrupt(digitalPinToInterrupt(Pin2_AD1), dataReadyISR_1, FALLING);
+    pinMode(Pin3_AD0, INPUT_PULLUP);
+    pinMode(Pin2_AD1, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(Pin3_AD0), dataReadyISR_0, FALLING);
+    attachInterrupt(digitalPinToInterrupt(Pin2_AD1), dataReadyISR_1, FALLING);
 
   // Interval in unsigned long microseconds
   if (ITimer.attachInterruptInterval(TIMER_INTERVAL_MS * 1000, TimerHandler))
@@ -286,10 +238,17 @@ void setup() {
 
 void loop() {
 
-    noInterrupts(); // 
+    //noInterrupts(); // 
     bool isDataReady_0 = newDataAvailable_0;
-    //bool isDataReady_1 = newDataAvailable_1;
-    interrupts(); //  restart interrupts
+    bool isDataReady_1 = newDataAvailable_1;
+    bool start_conversion=TimeToStartConversion;
+    //interrupts(); //  restart interrupts
+
+    uint32_t temp=0;
+    
+    int cap_num = reading_count % numCaps;
+    int read_num = reading_count / numCaps;
+
 
     if (Serial.available() > 0) {
         int incomingValue = Serial.parseInt();
@@ -325,10 +284,44 @@ void loop() {
         total += reading_count;
         reading_count = 0;
     }
-    if (isDataReady_0){
-        readSingleCapacitance(); 
+
+    if(start_conversion){
+        TimeToStartConversion=false;
+      //  Serial.println("Starting conversion");
+        switch (cap_num){
+
+            case 0:
+                capSensor1.writeCapSetupRegister(AD7746_CAPEN );
+                capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+                break;
+            case 1:
+                capSensor0.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
+                capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+                break;
+            case 2:
+                capSensor1.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
+                capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+                break;
+            case 3:
+                capSensor0.writeCapSetupRegister(AD7746_CAPEN );
+                capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+                break;
+
+        }
+        //Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
+        
+        // capSensor0.writeCapSetupRegister(0);
+        // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
         reading_count += 1;
+    }
+    if (isDataReady_0){
+        Serial.println("data0_ready");
+        temp = capSensor0.getCapacitance();
+        readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
+       // readSingleCapacitance(); 
+        
         newDataAvailable_0 = false;
+        
         // uint32_t status = capSensor0.readStatusRegister();
         // Serial.print(status);
         // Serial.println("A");
@@ -336,13 +329,16 @@ void loop() {
 
 
     }
-    // if (isDataReady_1){
+    if (isDataReady_1){
+     //   Serial.println("data1_ready");
+        temp = capSensor1.getCapacitance();
+        readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
     //     readSingleCapacitance(); 
     //     reading_count += 1;
-    //     newDataAvailable_1 = false;
-    //     // uint32_t status = capSensor1.readStatusRegister();
-    //     // Serial.print(status);   
-    //     // Serial.print("B");
-    //     // Serial.println(reading_count);
-    // }
+        newDataAvailable_1 = false;
+        // uint32_t status = capSensor1.readStatusRegister();
+        // Serial.print(status);   
+        // Serial.print("B");
+        // Serial.println(reading_count);
+    }
 }
