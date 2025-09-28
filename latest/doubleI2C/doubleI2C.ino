@@ -2,7 +2,7 @@
 #include "AD7746.h"
 #include "RPi_Pico_TimerInterrupt.h"
 //#include <FlexWire.h>
-#define TIMER_INTERVAL_MS 125L
+#define TIMER_INTERVAL_MS 25L
 // #define TCA9548A_ADDR 0x70 // Address of multiplexer
 #define AD7746_ADDR 0x48 // Address of sensor
 
@@ -19,11 +19,11 @@ volatile bool newDataAvailable_0 = false;
 volatile bool select_B_0 = false;
 // volatile bool select_B_1 = false;
 int reading_count = 0; // To record the status of array
-const int numReadings = 16; // Number of samples for mean filtering
+const int numReadings = 20; // Number of samples for mean filtering
 const int numCaps = 4;
 volatile uint8_t dacValue = 30;
-float readings[numCaps][numReadings];
-float fReadings[numCaps][numReadings];
+volatile float readings[numCaps][numReadings];
+// float fReadings[numCaps][numReadings];
 //TwoWire Wire1(6, 7);
 
 
@@ -111,49 +111,56 @@ void sensor1_init() {
 
 
 void readSingleCapacitance() {
-    uint32_t temp;
+    uint32_t temp=0;
     
     int cap_num = reading_count % numCaps;
     int read_num = reading_count / numCaps;
-    if (cap_num == 0 || cap_num == 1) {
-        temp = capSensor0.getCapacitance();
-    }
-    else {
-        temp = capSensor1.getCapacitance();
-    }
-    readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
-    // capSensor0.writeCapSetupRegister(0);
-    // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
+
     newDataAvailable_0 = false;
     switch (cap_num){
         case 3:
+            temp = capSensor1.getCapacitance();
+           // Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
+
             capSensor0.writeCapSetupRegister(AD7746_CAPEN );
             capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
            // newDataAvailable_0 = false;
             // Serial.println("0");
             // select_B_0 = true;
             break;
+
         case 0:
-            // capSensor0.writeCapSetupRegister(0);
-            // tca_select(1);
+            temp =capSensor0.getCapacitance();
+            capSensor1.writeCapSetupRegister(AD7746_CAPEN );
+            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+            //newDataAvailable_1 = false;
+            break;
+        case 1:
+            temp = capSensor1.getCapacitance();
+            // Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
+
             capSensor0.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
             capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
+            //newDataAvailable_1 = false;
+            break;
+
+        case 2:
+            temp = capSensor0.getCapacitance();
+            // capSensor0.writeCapSetupRegister(0);
+            // tca_select(1);
+            capSensor1.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
+            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
             
            // newDataAvailable_0 = false;
             // Serial.println("1");
             // select_B_0 = false;
             break;
-        case 1:
-            capSensor1.writeCapSetupRegister(AD7746_CAPEN );
-            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            //newDataAvailable_1 = false;
-            break;
-        case 2:
-            capSensor1.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
-            capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
-            //newDataAvailable_1 = false;
-            break;
     }
+    //Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
+    readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
+    // capSensor0.writeCapSetupRegister(0);
+    // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
+
 
 }
 
@@ -164,19 +171,22 @@ void readFilteredCapacitance() {
 
     float mean[] = {};
     float sum[numCaps] = {};
+
     for (int i = 0; i < numCaps; i++){
+        sum[i]=0; // NEED TO INITIALIZE THIS TO ZERO SIEGELJB
         for(int j = 0; j < numReadings; j++) {
             sum[i] += readings[i][j];             
         }
-        mean[i] = sum[i] / numReadings;
+        mean[i] = sum[i] / (float) numReadings;
     }
 
     float variance[numCaps] = {};
     for (int i = 0; i < numCaps; i++) { 
+        variance[i]=0; // NEED TO INITIALIZE THIS TO ZERO SIEGELJB
         for (int j = 0; j < numReadings; j++) {       
             variance[i] += pow(readings[i][j] - mean[i], 2);
         }
-        variance[i] /= numReadings;
+        variance[i] /= (float)numReadings;
     }
 
     // Serial.print("Variance for Cap0: ");
@@ -191,30 +201,49 @@ void readFilteredCapacitance() {
     // for (int i = 0; i < numReadings; i++){
     //     Serial.println(readings[0][i]);
     // }
+
+    float fSum[numCaps] = {};
+    float fMean[numCaps] = {};
     for (int i = 0; i < numCaps; i++){
         std_dev[i] = sqrt(variance[i]);
+        fSum[i]=0;
+        fMean[i] =0;
+        count[i]=0;
         lower_bound[i] = mean[i] - 3 * std_dev[i];
         upper_bound[i] = mean[i] + 3 * std_dev[i];
         for (int j = 0; j < numReadings; j++) {
             if (readings[i][j] >= lower_bound[i] && readings[i][j] <= upper_bound[i]) {
-                fReadings[i][count[i]] = readings[i][j];
+                // fReadings[i][count[i]] = readings[i][j];
                 count[i] += 1;
+                fSum[i]+=readings[i][j];
             }
+            fMean[i]=fSum[i]/count[i];
         }
-    }
-    float fSum[numCaps] = {};
-    float fMean[numCaps] = {};
-    for (int i = 0; i < numCaps; i++){
-        for(int j = 0; j < count[i]; j++) {
-                fSum[i] += fReadings[i][j];             
-        }
-        fMean[i] = fSum[i] / count[i];
     }
 
+    // for (int i = 0; i < numCaps; i++){
+    //     for(int j = 0; j < count[i]; j++) {
+    //             fSum[i] += fReadings[i][j];             
+    //     }
+    //     fMean[i] = fSum[i] / count[i];
+    // }
+
     Serial.print("Capacitance0: ");
-    Serial.println(fMean[0], 5);
+    Serial.print(mean[0], 5);
+    Serial.print(",");
+    Serial.print(std_dev[0], 5);
+    Serial.print(",");
+    Serial.print(fMean[0], 5);
+    Serial.print(",");
+    Serial.println(count[0], 5);
     Serial.print("Capacitance1: ");
-    Serial.println(fMean[1], 5);
+    Serial.print(mean[1], 5);
+    Serial.print(",");
+    Serial.print(std_dev[1], 5);
+    Serial.print(",");
+    Serial.print(fMean[1], 5);
+    Serial.print(",");
+    Serial.println(count[1], 5);
     Serial.print("Capacitance2: ");
     Serial.println(fMean[2], 5);
     Serial.print("Capacitance3: ");
@@ -282,8 +311,16 @@ void loop() {
     
     // total += 1;
    
-    if (reading_count == numCaps * numReadings){
+    if (reading_count >= numCaps * numReadings){
         // Enough readings for data processing
+         Serial.printf("2D Array Elements:\n");
+        for (int i = 0; i < numCaps; i++) {
+            for (int j = 0; j < numReadings; j++) {
+                Serial.printf("%f ", readings[i][j]);
+            }
+            Serial.printf("\n");
+        }
+
         readFilteredCapacitance();
         total += reading_count;
         reading_count = 0;
@@ -296,6 +333,8 @@ void loop() {
         // Serial.print(status);
         // Serial.println("A");
         // Serial.println(reading_count);
+
+
     }
     // if (isDataReady_1){
     //     readSingleCapacitance(); 
