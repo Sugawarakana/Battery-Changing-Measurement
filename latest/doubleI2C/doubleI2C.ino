@@ -2,7 +2,7 @@
 #include "AD7746.h"
 #include "RPi_Pico_TimerInterrupt.h"
 //#include <FlexWire.h>
-#define TIMER_INTERVAL_MS 50L
+#define TIMER_INTERVAL_MS 50L // must be more than sampling rate by 2
 // #define TCA9548A_ADDR 0x70 // Address of multiplexer
 #define AD7746_ADDR 0x48 // Address of sensor
 
@@ -20,7 +20,7 @@ volatile bool newDataAvailable_1 = false;
 volatile bool select_B_0 = false;
 // volatile bool select_B_1 = false;
 int reading_count = 0; // To record the status of array
-const int numReadings = 20; // Number of samples for mean filtering
+const int numReadings = 100; // Number of samples for mean filtering
 const int numCaps = 4;
 volatile uint8_t dacValue = 30;
 volatile float readings[numCaps][numReadings];
@@ -121,7 +121,7 @@ void sensor1_init() {
 // **Function to get filtered capacitance value using median filtering**
 void readFilteredCapacitance() {
 
-    float mean[] = {};
+    float mean[numCaps] = {};
     float sum[numCaps] = {};
 
     for (int i = 0; i < numCaps; i++){
@@ -187,7 +187,7 @@ void readFilteredCapacitance() {
     Serial.print(",");
     Serial.print(fMean[0], 5);
     Serial.print(",");
-    Serial.println(count[0], 5);
+    Serial.println(count[0]);
     Serial.print("Capacitance1: ");
     Serial.print(mean[1], 5);
     Serial.print(",");
@@ -195,12 +195,24 @@ void readFilteredCapacitance() {
     Serial.print(",");
     Serial.print(fMean[1], 5);
     Serial.print(",");
-    Serial.println(count[1], 5);
+    Serial.println(count[1]);
     Serial.print("Capacitance2: ");
-    Serial.println(fMean[2], 5);
+    Serial.print(mean[2], 5);
+    Serial.print(",");
+    Serial.print(std_dev[2], 5);
+    Serial.print(",");
+    Serial.print(fMean[2], 5);
+    Serial.print(",");
+    Serial.println(count[2]);
     Serial.print("Capacitance3: ");
-    Serial.println(fMean[3], 5);
-    Serial.println(" ");
+    Serial.print(mean[3], 5);
+    Serial.print(",");
+    Serial.print(std_dev[3], 5);
+    Serial.print(",");
+    Serial.print(fMean[3], 5);
+    Serial.print(",");
+    Serial.println(count[3]);
+    //Serial.println(" ");
 }
 
 
@@ -272,13 +284,13 @@ void loop() {
    
     if (reading_count >= numCaps * numReadings){
         // Enough readings for data processing
-         Serial.printf("2D Array Elements:\n");
-        for (int i = 0; i < numCaps; i++) {
-            for (int j = 0; j < numReadings; j++) {
-                Serial.printf("%f ", readings[i][j]);
-            }
-            Serial.printf("\n");
-        }
+        //  Serial.printf("2D Array Elements:\n");
+        // for (int i = 0; i < numCaps; i++) {
+        //     for (int j = 0; j < numReadings; j++) {
+        //         Serial.printf("%f ", readings[i][j]);
+        //     }
+        //     Serial.printf("\n");
+        // }
 
         readFilteredCapacitance();
         total += reading_count;
@@ -315,7 +327,7 @@ void loop() {
         reading_count += 1;
     }
     if (isDataReady_0){
-        Serial.println("data0_ready");
+       // Serial.println("data0_ready");
         temp = capSensor0.getCapacitance();
         readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
        // readSingleCapacitance(); 
