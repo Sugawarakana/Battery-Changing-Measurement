@@ -2,7 +2,7 @@
 #include "AD7746.h"
 #include "RPi_Pico_TimerInterrupt.h"
 //#include <FlexWire.h>
-#define TIMER_INTERVAL_MS 50L // must be more than sampling rate by 2
+#define TIMER_INTERVAL_MS 125L // must be more than sampling rate which is 62.5
 // #define TCA9548A_ADDR 0x70 // Address of multiplexer
 #define AD7746_ADDR 0x48 // Address of sensor
 
@@ -20,9 +20,9 @@ volatile bool newDataAvailable_1 = false;
 volatile bool select_B_0 = false;
 // volatile bool select_B_1 = false;
 int reading_count = 0; // To record the status of array
-const int numReadings = 100; // Number of samples for mean filtering
+const int numReadings = 50; // Number of samples for mean filtering
 const int numCaps = 4;
-volatile uint8_t dacValue[4] = {30,10,30,10};
+volatile uint8_t dacValue[4] = {70,70,70,70};
 volatile float readings[numCaps][numReadings];
 // float fReadings[numCaps][numReadings];
 //TwoWire Wire1(6, 7);
@@ -58,7 +58,7 @@ void sensor0_init() {
     Serial.println(offset);
 
 //     // Configure Excitation Voltage to VDD/2 for stability
-    capSensor0.writeExcSetupRegister(0x1B);
+    capSensor0.writeExcSetupRegister(0x2B);
     // capSensor0.writeExcSetupRegister(0x03);
 //     Serial.println("Excitation Voltage Set to VDD/2");//vdd/4
 
@@ -92,7 +92,7 @@ void sensor1_init() {
     Serial.println(offset);
 
     // Configure Excitation Voltage to VDD/2 for stability
-    capSensor1.writeExcSetupRegister(0x1B);
+    capSensor1.writeExcSetupRegister(0x2B);
   
     // Serial.println("Excitation Voltage Set to VDD/2");//vdd/4
 
@@ -187,7 +187,10 @@ void readFilteredCapacitance() {
     Serial.print(",");
     Serial.print(fMean[0], 5);
     Serial.print(",");
-    Serial.println(count[0]);
+    Serial.print(count[0]);
+    Serial.print(",");
+    Serial.println(dacValue[0]);
+
     Serial.print("Capacitance1: ");
     Serial.print(mean[1], 5);
     Serial.print(",");
@@ -195,7 +198,9 @@ void readFilteredCapacitance() {
     Serial.print(",");
     Serial.print(fMean[1], 5);
     Serial.print(",");
-    Serial.println(count[1]);
+    Serial.print(count[1]);
+    Serial.print(",");
+    Serial.println(dacValue[1]);
     Serial.print("Capacitance2: ");
     Serial.print(mean[2], 5);
     Serial.print(",");
@@ -203,7 +208,9 @@ void readFilteredCapacitance() {
     Serial.print(",");
     Serial.print(fMean[2], 5);
     Serial.print(",");
-    Serial.println(count[2]);
+    Serial.print(count[2]);
+    Serial.print(",");
+    Serial.println(dacValue[2]);
     Serial.print("Capacitance3: ");
     Serial.print(mean[3], 5);
     Serial.print(",");
@@ -211,7 +218,9 @@ void readFilteredCapacitance() {
     Serial.print(",");
     Serial.print(fMean[3], 5);
     Serial.print(",");
-    Serial.println(count[3]);
+    Serial.print(count[3]);
+    Serial.print(",");
+    Serial.println(dacValue[3]);
     //Serial.println(" ");
 }
 
@@ -255,7 +264,8 @@ void loop() {
     bool isDataReady_1 = newDataAvailable_1;
     bool start_conversion=TimeToStartConversion;
     //interrupts(); //  restart interrupts
-
+    int index = 0;
+    int incomingValue = 0;
     uint32_t temp=0;
     
     int cap_num = reading_count % numCaps;
@@ -263,15 +273,16 @@ void loop() {
 
 
     if (Serial.available() > 0) {
-        int incomingValue = Serial.parseInt();
+        index = Serial.parseInt();
+        incomingValue = Serial.parseInt();
         while (Serial.available()) {
             Serial.read(); 
         } // make this read 4 values.
-        dacValue[0] = incomingValue;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
+        dacValue[index] = incomingValue;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
 //        capSensor0.writeCapDacARegister(dacValue | AD7746_DACAEN);
 //       capSensor1.writeCapDacARegister(dacValue | AD7746_DACAEN);
-        Serial.print("Offset changed to ");
-        Serial.print(incomingValue);
+        Serial.printf("Offset changed to Dac[0]=%f pF, Dac[1]=%f pF, Dac[2]=%f pF, Dac[3]=%f pF \n",0.133858 * dacValue[0],0.133858 * dacValue[1],0.133858 * dacValue[2],0.133858 * dacValue[3]);
+    
     }
 
     // Serial.println("working");
@@ -337,6 +348,16 @@ void loop() {
     }
     if (isDataReady_0){
        // Serial.println("data0_ready");
+
+       if(cap_num==1)
+      { 
+        Serial.print("got 1 expected 0 or 2");
+      }
+        if(cap_num==3)
+     {  
+        Serial.print("got 3 expected 0 or 2");
+        }
+
         temp = capSensor0.getCapacitance();
         readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue[cap_num];
        // readSingleCapacitance(); 
