@@ -22,7 +22,7 @@ volatile bool select_B_0 = false;
 int reading_count = 0; // To record the status of array
 const int numReadings = 100; // Number of samples for mean filtering
 const int numCaps = 4;
-volatile uint8_t dacValue = 30;
+volatile uint8_t dacValue[4] = {30,10,30,10};
 volatile float readings[numCaps][numReadings];
 // float fReadings[numCaps][numReadings];
 //TwoWire Wire1(6, 7);
@@ -58,7 +58,7 @@ void sensor0_init() {
     Serial.println(offset);
 
 //     // Configure Excitation Voltage to VDD/2 for stability
-    capSensor0.writeExcSetupRegister(0x0B);
+    capSensor0.writeExcSetupRegister(0x1B);
     // capSensor0.writeExcSetupRegister(0x03);
 //     Serial.println("Excitation Voltage Set to VDD/2");//vdd/4
 
@@ -71,7 +71,7 @@ void sensor0_init() {
 
 //     // Configure Cap DAC to shift the reference to 8 pF (so we measure 4 - 12 pF)
     // uint8_t dacValue = 60;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
-    capSensor0.writeCapDacARegister(dacValue | AD7746_DACAEN); // Enable Cap DAC A
+    capSensor0.writeCapDacARegister(dacValue[0] | AD7746_DACAEN); // Enable Cap DAC A
 
     capSensor0.writeCapSetupRegister(AD7746_CAPEN);
     // capSensor0.writeCapSetupRegister(0);
@@ -92,7 +92,7 @@ void sensor1_init() {
     Serial.println(offset);
 
     // Configure Excitation Voltage to VDD/2 for stability
-    capSensor1.writeExcSetupRegister(0x0B);
+    capSensor1.writeExcSetupRegister(0x1B);
   
     // Serial.println("Excitation Voltage Set to VDD/2");//vdd/4
 
@@ -106,7 +106,7 @@ void sensor1_init() {
 
     // Configure Cap DAC to shift the reference to 8 pF (so we measure 4 - 12 pF)
     // uint8_t dacValue = 60;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
-    capSensor1.writeCapDacARegister(dacValue | AD7746_DACAEN); // Enable Cap DAC A
+    capSensor1.writeCapDacARegister(dacValue[1] | AD7746_DACAEN); // Enable Cap DAC A
     // Serial.println("Cap DAC A Configured to 8 pF Offset");
 
     // Serial.println("AD7746 Configuration Complete. Reading Capacitance...");
@@ -266,10 +266,10 @@ void loop() {
         int incomingValue = Serial.parseInt();
         while (Serial.available()) {
             Serial.read(); 
-        }
-        dacValue = incomingValue;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
-        capSensor0.writeCapDacARegister(dacValue | AD7746_DACAEN);
-        capSensor1.writeCapDacARegister(dacValue | AD7746_DACAEN);
+        } // make this read 4 values.
+        dacValue[0] = incomingValue;  // (8 pF / 0.133858 pF per unit) ≈ 60 12pF
+//        capSensor0.writeCapDacARegister(dacValue | AD7746_DACAEN);
+//       capSensor1.writeCapDacARegister(dacValue | AD7746_DACAEN);
         Serial.print("Offset changed to ");
         Serial.print(incomingValue);
     }
@@ -299,37 +299,46 @@ void loop() {
 
     if(start_conversion){
         TimeToStartConversion=false;
+
       //  Serial.println("Starting conversion");
         switch (cap_num){
 
             case 0:
+                capSensor1.writeCapDacARegister(dacValue[1] | AD7746_DACAEN); // Enable Cap DAC A
+
                 capSensor1.writeCapSetupRegister(AD7746_CAPEN );
                 capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
                 break;
             case 1:
+                capSensor0.writeCapDacARegister(dacValue[2] | AD7746_DACAEN); // Enable Cap DAC A
+
                 capSensor0.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
                 capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
                 break;
             case 2:
-                capSensor1.writeCapSetupRegister(AD7746_CAPEN| AD7746_CIN2);
+                capSensor1.writeCapDacARegister(dacValue[3] | AD7746_DACAEN); // Enable Cap DAC A
+
+                capSensor1.writeCapSetupRegister(AD7746_CAPEN);
                 capSensor1.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
                 break;
             case 3:
-                capSensor0.writeCapSetupRegister(AD7746_CAPEN );
+                capSensor0.writeCapDacARegister(dacValue[0] | AD7746_DACAEN); // Enable Cap DAC A
+
+                capSensor0.writeCapSetupRegister(AD7746_CAPEN | AD7746_CIN2);
                 capSensor0.writeConfigurationRegister(AD7746_CAPF_62P0 | AD7746_MD_SINGLE_CONVERSION);
                 break;
 
         }
         //Serial.printf("reading count %d : %d : %d \n",reading_count,cap_num,read_num);
+    reading_count += 1;
         
         // capSensor0.writeCapSetupRegister(0);
         // capSensor1.writeCapSetupRegister(AD7746_CAPEN);
-        reading_count += 1;
     }
     if (isDataReady_0){
        // Serial.println("data0_ready");
         temp = capSensor0.getCapacitance();
-        readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
+        readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue[cap_num];
        // readSingleCapacitance(); 
         
         newDataAvailable_0 = false;
@@ -344,7 +353,7 @@ void loop() {
     if (isDataReady_1){
      //   Serial.println("data1_ready");
         temp = capSensor1.getCapacitance();
-        readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue;
+        readings[cap_num][read_num] = (float) temp * (4.00 / 0x800000) + 0.133858 * dacValue[cap_num];
     //     readSingleCapacitance(); 
     //     reading_count += 1;
         newDataAvailable_1 = false;
